@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\SeriesRepository;
 use App\Entity\Series;
+use App\Repository\SeriesRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class SeriesController extends AbstractController
 {
@@ -30,7 +30,7 @@ class SeriesController extends AbstractController
 
     }
 
-    #[Route('/series/create', methods:['GET'])]
+    #[Route('/series/create',  name: 'app_series_form', methods:['GET'])]
     public function addSeriesForm(): Response
     {
         
@@ -38,7 +38,7 @@ class SeriesController extends AbstractController
 
     }
 
-    #[Route('/series/create', methods:['POST'])]
+    #[Route('/series/create', name: 'app_add_series', methods:['POST'])]
     public function addSeries(Request $request): Response
     {
 
@@ -49,5 +49,13 @@ class SeriesController extends AbstractController
 
         return new RedirectResponse('/series');
 
+    }
+
+    #[Route('/series/delete/{id}', name: 'app_delete_series', methods:['DELETE'], requirements:['id' => '[0-9]+'])]
+    public function deleteSeries(int $id): Response
+    {       
+        $this->seriesRepository->removeById($id);
+
+        return new RedirectResponse('/series');
     }
 }
