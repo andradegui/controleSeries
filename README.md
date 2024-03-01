@@ -30,3 +30,6 @@
 
 ### Executar Migration
 `php bin/console doctrine:migrations:migrate`
+
+### Listar as rotas da aplicação
+`php bin/console debug:router`
