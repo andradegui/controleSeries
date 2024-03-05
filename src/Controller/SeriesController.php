@@ -57,7 +57,11 @@ class SeriesController extends AbstractController
     public function addSeries(Request $request): Response
     {
         $series = new Series();
-        $this->createForm(SeriesType::class, $series)->handleRequest($request);
+        $seriesForm = $this->createForm(SeriesType::class, $series)->handleRequest($request);
+
+        if( !$seriesForm->isValid() ){
+            return $this->renderForm('series/form.html.twig', compact('seriesForm'));
+        }
 
         $this->addFlash('success', "Série \"{$series->getName()}\"	adicionada c/ sucesso");
         // Forma simples de trabalhar com Flash Message
@@ -86,17 +90,28 @@ class SeriesController extends AbstractController
     #[Route('/series/edit/{series}', name: 'app_edit_series_form', methods:['GET'])]
     public function editSeriesForm(Series $series): Response
     {       
-        return $this->render('series/form.html.twig', compact('series'));
+        $seriesForm = $this->createForm(SeriesType::class, $series, ['flag_edit' => true]);
+        return $this->renderForm('series/form.html.twig', compact('seriesForm', 'series'));
     }
 
     #[Route('/series/edit/{series}', name: 'app_store_series_changes', methods:['PATCH'])]
     public function editSeriesChanges(Series $series, Request $request): Response
     {  
         
-        $series->setName($request->request->get('name'));
+        $seriesForm = $this->createForm(SeriesType::class, $series, ['flag_edit' => true]);
+        $seriesForm->handleRequest($request);
+
+        // Forma simples de atualizar o dado quando utilizar HTML no twig
+        // $series->setName($request->request->get('name'));
+
+        if( !$seriesForm->isValid() ){
+            return $this->renderForm('series/form.html.twig', compact('seriesForm', 'series'));
+        }
+
         $this->addFlash('warning', "Série \"{$series->getName()}\" editada c/ sucesso");
         //  Forma simples de trabalhar com Flash Message
         // $request->getSession()->set('success', "Série \"{$series->getName()}\" editada c/ sucesso");
+
         $this->entityManager->flush();
 
         return new RedirectResponse('/series');
