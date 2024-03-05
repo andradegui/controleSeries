@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use App\Form\SeriesType;
 
 class SeriesController extends AbstractController
 {
@@ -39,23 +42,28 @@ class SeriesController extends AbstractController
     #[Route('/series/create',  name: 'app_series_form', methods:['GET'])]
     public function addSeriesForm(): Response
     {
+        // $seriesForm = $this->createFormBuilder(new Series(''))
+        //         ->add('name', TextType::class, ['label' => 'Nome Série:'])
+        //         ->add('save', SubmitType::class, ['label' => 'Adicionar'])
+        //         ->getForm();
+
+        $seriesForm = $this->createForm(SeriesType::class, new Series());
         
-        return $this->render('series/form.html.twig');
+        return $this->renderForm('series/form.html.twig', compact('seriesForm'));
 
     }
 
     #[Route('/series/create', name: 'app_add_series', methods:['POST'])]
     public function addSeries(Request $request): Response
     {
+        $series = new Series();
+        $this->createForm(SeriesType::class, $series)->handleRequest($request);
 
-        $serieName = $request->request->get('name');
-        $serie = new Series($serieName);
-
-        $this->addFlash('success', "Série \"{$serieName}\"	adicionada c/ sucesso");
+        $this->addFlash('success', "Série \"{$series->getName()}\"	adicionada c/ sucesso");
         // Forma simples de trabalhar com Flash Message
         // $request->getSession()->set('success', "Série \"{$serieName}\"	adicionada c/ sucesso");
 
-        $this->seriesRepository->add($serie, true);
+        $this->seriesRepository->add($series, true);
 
         return new RedirectResponse('/series');
 
