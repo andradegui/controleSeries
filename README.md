@@ -33,3 +33,6 @@
 
 ### Listar as rotas da aplicação
 `php bin/console debug:router`
+
+### Criar arquivo de formulário
+`php bin/console make:form SeriesType`
