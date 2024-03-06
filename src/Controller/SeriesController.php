@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Series;
+use App\Entity\Season;
+use App\Entity\Episode;
 use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Form\SeriesType;
+use App\DTO\SeriesCreateFormInput;
 
 class SeriesController extends AbstractController
 {
@@ -47,7 +50,7 @@ class SeriesController extends AbstractController
         //         ->add('save', SubmitType::class, ['label' => 'Adicionar'])
         //         ->getForm();
 
-        $seriesForm = $this->createForm(SeriesType::class, new Series());
+        $seriesForm = $this->createForm(SeriesType::class, new SeriesCreateFormInput());
         
         return $this->renderForm('series/form.html.twig', compact('seriesForm'));
 
@@ -56,11 +59,27 @@ class SeriesController extends AbstractController
     #[Route('/series/create', name: 'app_add_series', methods:['POST'])]
     public function addSeries(Request $request): Response
     {
-        $series = new Series();
-        $seriesForm = $this->createForm(SeriesType::class, $series)->handleRequest($request);
+        $input = new SeriesCreateFormInput();
+        $seriesForm = $this->createForm(SeriesType::class, $input)->handleRequest($request);
 
         if( !$seriesForm->isValid() ){
             return $this->renderForm('series/form.html.twig', compact('seriesForm'));
+        }
+
+        $series = new Series($input->seriesName);
+
+        for( $i = 1; $i <= $input->seasonsQuantity; $i++ ){
+
+            $season = new Season($i);
+
+            for( $j = 1; $j <= $input->episodesPerSeason; $j++ ){
+
+                $season->addEpisode(new Episode($j));
+
+            }
+
+            $series->addSeason($season);
+
         }
 
         $this->addFlash('success', "Série \"{$series->getName()}\"	adicionada c/ sucesso");

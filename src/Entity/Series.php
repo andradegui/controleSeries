@@ -16,7 +16,7 @@ class Series
     #[ORM\Column]
     private int $id;
 
-    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'series', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'series', orphanRemoval: true, cascade: ['persist'])]
     private Collection $seasons;
 
     public function __construct(#[ORM\Column]
