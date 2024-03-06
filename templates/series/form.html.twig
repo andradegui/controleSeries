@@ -8,6 +8,8 @@
 
 {% block body %}
 
+    <a href="{{ path('app_series') }}" class="btn btn-dark mb-3">Voltar</a>
+
     {{ form_start(seriesForm) }}
     {{ form_row(seriesForm.seriesName) }}
     {{ form_row(seriesForm.seasonsQuantity) }}

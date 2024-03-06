@@ -21,7 +21,9 @@
         {% for series in seriesList %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
 
-                {{ series.name }}
+                <a href="{{ path('app_season', {series: series.id}) }}" class="btn btn-light active" alt="Ver temporadas">                
+                    {{ series.name }}
+                </a>
 
                 <div class="d-flex">
                 
