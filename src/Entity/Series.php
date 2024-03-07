@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeriesRepository::class)]
+#[ORM\Cache]
 class Series
 {
     #[ORM\Id]
@@ -17,6 +18,7 @@ class Series
     private int $id;
 
     #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'series', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\Cache]
     private Collection $seasons;
 
     public function __construct(#[ORM\Column]
