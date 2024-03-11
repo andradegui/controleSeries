@@ -31,6 +31,9 @@
 ### Executar Migration
 `php bin/console doctrine:migrations:migrate`
 
+### Reverter Migration
+`php bin/console doctrine:migrations:execute --down 'DoctrineMigrations\Version20240308140841'`
+
 ### Listar as rotas da aplicação
 `php bin/console debug:router`
 
