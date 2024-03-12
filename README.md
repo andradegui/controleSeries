@@ -39,3 +39,12 @@
 
 ### Criar arquivo de formulário
 `php bin/console make:form SeriesType`
+
+### Criar funcionalidade de autenticação
+> Documentação Symfony p/ auxiliar 
+> https://symfony.com/doc/6.3/security.html#form-login
+
+`php bin/console make:user`
+`php bin/console make:migration`
+`composer require symfonycasts/verify-email-bundle`
+`php bin/console make:registration-form`
