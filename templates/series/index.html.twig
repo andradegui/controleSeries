@@ -14,29 +14,46 @@
 
     {% endif %} #}
 
+    {# Tentativas de fazer um menu #}
     {# <div class="d-flex justify-content-between">
         <a href="{{ path('app_series_form') }}" class="btn btn-dark mb-3">Adicionar</a>
     
         <a href="{{ path('app_logout') }}" class="btn btn-sm btn-danger mb-4">Sair</a>
     </div> #}
 
-    <div class="container-fluid d-flex justify-content-between align-items-center p-2">
+    {# <div class="container-fluid d-flex justify-content-between align-items-center p-2">
         <a href="{{ path('app_series') }}" class="btn btn-dark">Home</a>
         <a href="{{ path('app_logout') }}" class="btn btn-danger">Sair</a>
-    </div>
+    </div> #}
 
-    <div class="container d-flex justify-content-center text-center align-items-center">
+    {# <div class="container d-flex justify-content-center text-center align-items-center">
         <a href="{{ path('app_series_form') }}" class="btn btn-dark mb-3 ">Adicionar série</a>
-    </div>
+    </div> #}
+
+    {% if is_granted('ROLE_USER') %}
+
+    <a href="{{ path('app_series_form') }}" class="btn btn-dark mb-3 ">Adicionar série</a>
+
+    {% endif %}  
 
     <ul class="list-group">
 
         {% for series in seriesList %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
 
+                {% if is_granted('ROLE_USER') %}
+
                 <a href="{{ path('app_season', {series: series.id}) }}" class="btn btn-light active" alt="Ver temporadas">                
                     {{ series.name }}
                 </a>
+                {% else %}
+
+                 {{ series.name }}
+
+                {% endif %}
+
+                  
+                {% if is_granted('ROLE_USER') %}
 
                 <div class="d-flex">
                 
@@ -48,6 +65,8 @@
                     </form>
                 
                 </div>
+
+                {% endif %}
 
             </li>
         {% endfor %}

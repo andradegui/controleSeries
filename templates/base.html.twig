@@ -16,9 +16,18 @@
     </head>
     <body>
 
-        <div class="container">            
+        <div class="container">
 
-            <h1>{{ block('title') }}</h1>
+            {% if is_granted('ROLE_USER') %}
+
+                <div class="container-fluid d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ path('app_series') }}" class="btn btn-dark">Home</a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-danger">Sair</a>
+                </div>  
+
+            {% endif %}              
+
+            <h1>{{ block('title') }}</h1> 
             
             {% for type, messages in app.flashes %}
                 {% for message in messages %}

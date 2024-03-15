@@ -4,10 +4,11 @@
 
 {% block body %}
 
-    <div class="container-fluid d-flex justify-content-between align-items-center p-2">
+    {# <div class="container-fluid d-flex justify-content-between align-items-center p-2">
         <a href="{{ path('app_series') }}" class="btn btn-dark">Home</a>
         <a href="{{ path('app_logout') }}" class="btn btn-danger">Sair</a>
-    </div>
+    </div> #}
+    {% if is_granted('ROLE_USER') %}
 
     <ul class="list-group m-3">
 
@@ -31,4 +32,6 @@
     
     </ul>
 
+    {% endif %}  
+    
 {% endblock %}
