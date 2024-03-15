@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
-use App\Entity\Series;
 use App\Entity\Season;
+use App\Entity\Series;
 use App\Entity\Episode;
+use App\Form\SeriesType;
+use App\Form\SeriesEditType;
+use App\DTO\SeriesCreateFormInput;
 use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use App\Form\SeriesType;
-use App\DTO\SeriesCreateFormInput;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SeriesController extends AbstractController
 {
@@ -109,22 +110,22 @@ class SeriesController extends AbstractController
     #[Route('/series/edit/{series}', name: 'app_edit_series_form', methods:['GET'])]
     public function editSeriesForm(Series $series): Response
     {       
-        $seriesForm = $this->createForm(SeriesType::class, $series, ['flag_edit' => true]);
-        return $this->renderForm('series/form.html.twig', compact('seriesForm', 'series'));
+        $seriesForm = $this->createForm(SeriesEditType::class, $series);
+        return $this->renderForm('series/edit.html.twig', compact('seriesForm', 'series'));
     }
 
     #[Route('/series/edit/{series}', name: 'app_store_series_changes', methods:['PATCH'])]
     public function editSeriesChanges(Series $series, Request $request): Response
     {  
         
-        $seriesForm = $this->createForm(SeriesType::class, $series, ['flag_edit' => true]);
+        $seriesForm = $this->createForm(SeriesEditType::class, $series);
         $seriesForm->handleRequest($request);
 
         // Forma simples de atualizar o dado quando utilizar HTML no twig
         // $series->setName($request->request->get('name'));
 
         if( !$seriesForm->isValid() ){
-            return $this->renderForm('series/form.html.twig', compact('seriesForm', 'series'));
+            return $this->renderForm('series/edit.html.twig', compact('seriesForm', 'series'));
         }
 
         $this->addFlash('warning', "Série \"{$series->getName()}\" editada c/ sucesso");

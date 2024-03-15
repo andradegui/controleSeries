@@ -2,22 +2,21 @@
 
 {% block title %}
 
-    {{  series is defined ? 'Editar' : 'Nova'}} Série
+     Nova Série
 
 {% endblock %}
 
 {% block body %}
 
-    <div class="container-fluid bg-light d-flex justify-content-between align-items-center p-2">
+    {# <div class="container-fluid bg-light d-flex justify-content-between align-items-center p-2">
         <a href="{{ path('app_series') }}" class="btn btn-dark">Home</a>
         <a href="{{ path('app_logout') }}" class="btn btn-danger">Sair</a>
-    </div>
+    </div> #}
     
     {{ form_start(seriesForm) }}
     {{ form_row(seriesForm.seriesName) }}
     {{ form_row(seriesForm.seasonsQuantity) }}
     {{ form_row(seriesForm.episodesPerSeason) }}
-    {# {{ form_widget(seriesForm.name, {'attr': {'class': 'form-control-sm'}}) }} #}
     {{ form_widget(seriesForm.save, {'attr': {'class': 'btn-dark'}}) }}
     {{ form_end(seriesForm) }}
 
