@@ -7,10 +7,12 @@ use App\Entity\Series;
 use App\Entity\Episode;
 use App\Form\SeriesType;
 use App\Form\SeriesEditType;
+use Symfony\Component\Mime\Email;
 use App\DTO\SeriesCreateFormInput;
 use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,7 +23,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class SeriesController extends AbstractController
 {
 
-    public function __construct(private SeriesRepository $seriesRepository, private EntityManagerInterface $entityManager){
+    public function __construct(
+        private SeriesRepository $seriesRepository, 
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer
+    ){
 
     }
 
@@ -82,6 +88,21 @@ class SeriesController extends AbstractController
             $series->addSeason($season);
 
         }
+
+        $user = $this->getUser();
+
+        $email = (new Email())
+                    ->from('controleseries@email.com')
+                    ->to($user->getUserIdentifier())
+                    //->cc('cc@example.com')
+                    //->bcc('bcc@example.com')
+                    //->replyTo('fabien@example.com')
+                    //->priority(Email::PRIORITY_HIGH)
+                    ->subject('Nova série criada')
+                    ->text("Série {$series->getName()} foi criada")
+                    ->html('<h1>Série Criada!</h1><p>Série {$series->getName()} foi criada</p>');
+
+        $this->mailer->send($email);
 
         $this->addFlash('success', "Série \"{$series->getName()}\"	adicionada c/ sucesso");
         // Forma simples de trabalhar com Flash Message
