@@ -16,6 +16,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,8 @@ class SeriesController extends AbstractController
     public function __construct(
         private SeriesRepository $seriesRepository, 
         private EntityManagerInterface $entityManager,
-        private MailerInterface $mailer
+        private MailerInterface $mailer,
+        private SluggerInterface $slugger
     ){
 
     }
@@ -69,46 +71,65 @@ class SeriesController extends AbstractController
         $input = new SeriesCreateFormInput();
         $seriesForm = $this->createForm(SeriesType::class, $input)->handleRequest($request);
 
+        /**@var UploadedFile $uploadedCoverImage */
+        $uploadedCoverImage = $seriesForm->get('coverImage')->getData();
+
+        if( $uploadedCoverImage ){
+
+            $originalFilename = pathinfo($uploadedCoverImage->getClientOriginalName(), PATHINFO_FILENAME);
+            // this is needed to safely include the file name as part of the URL
+            $safeFilename = $this->slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' .$uploadedCoverImage->guessExtension();
+
+            $uploadedCoverImage->move(
+                $this->getParameter('cover_image_directory'),
+                $newFilename
+            );
+
+            $input->coverImage = $newFilename;
+
+        }
+
         if( !$seriesForm->isValid() ){
             return $this->renderForm('series/form.html.twig', compact('seriesForm'));
         }
 
-        $series = new Series($input->seriesName);
+        // $series = new Series($input->seriesName);
 
-        for( $i = 1; $i <= $input->seasonsQuantity; $i++ ){
+        // for( $i = 1; $i <= $input->seasonsQuantity; $i++ ){
 
-            $season = new Season($i);
+        //     $season = new Season($i);
 
-            for( $j = 1; $j <= $input->episodesPerSeason; $j++ ){
+        //     for( $j = 1; $j <= $input->episodesPerSeason; $j++ ){
 
-                $season->addEpisode(new Episode($j));
+        //         $season->addEpisode(new Episode($j));
 
-            }
+        //     }
 
-            $series->addSeason($season);
+        //     $series->addSeason($season);
 
-        }
+        // }
 
-        $user = $this->getUser();
+        // $user = $this->getUser();
 
-        $email = (new Email())
-                    ->from('controleseries@email.com')
-                    ->to($user->getUserIdentifier())
-                    //->cc('cc@example.com')
-                    //->bcc('bcc@example.com')
-                    //->replyTo('fabien@example.com')
-                    //->priority(Email::PRIORITY_HIGH)
-                    ->subject('Nova série criada')
-                    ->text("Série {$series->getName()} foi criada")
-                    ->html("<h1>Série Criada!</h1><p>Série {$series->getName()} foi criada</p>");
+        // $email = (new Email())
+        //             ->from('controleseries@email.com')
+        //             ->to($user->getUserIdentifier())
+        //             //->cc('cc@example.com')
+        //             //->bcc('bcc@example.com')
+        //             //->replyTo('fabien@example.com')
+        //             //->priority(Email::PRIORITY_HIGH)
+        //             ->subject('Nova série criada')
+        //             ->text("Série {$series->getName()} foi criada")
+        //             ->html("<h1>Série Criada!</h1><p>Série {$series->getName()} foi criada</p>");
 
-        $this->mailer->send($email);
+        // $this->mailer->send($email);
+
+        $series = $this->seriesRepository->add($input);
 
         $this->addFlash('success', "Série \"{$series->getName()}\"	adicionada c/ sucesso");
         // Forma simples de trabalhar com Flash Message
         // $request->getSession()->set('success', "Série \"{$serieName}\"	adicionada c/ sucesso");
-
-        $this->seriesRepository->add($series, true);
 
         return new RedirectResponse('/series');
 

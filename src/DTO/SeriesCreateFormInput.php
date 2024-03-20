@@ -2,12 +2,24 @@
 
 namespace App\DTO;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class SeriesCreateFormInput{
 
     public function __construct(
+
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 5)]
         public string $seriesName = '',
+
+        #[Assert\Positive]
         public int $seasonsQuantity = 0,
-        public int $episodesPerSeason = 0
+
+        #[Assert\Positive]
+        public int $episodesPerSeason = 0,
+
+        #[Assert\File]
+        public ?string $coverImage = null,
 
     ){
 

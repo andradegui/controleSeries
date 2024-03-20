@@ -2,9 +2,16 @@
 
 namespace App\Repository;
 
+use App\Entity\Season;
 use App\Entity\Series;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Episode;
+use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
+use App\DTO\SeriesCreateFormInput;
+use App\Repository\SeasonRepository;
+use App\Repository\EpisodeRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Series>
@@ -16,19 +23,41 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SeriesRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+            ManagerRegistry $registry,
+            private SeasonRepository $seasonRepository,
+            private EpisodeRepository $episodeRepository,
+            private LoggerInterface $logger
+        )
     {
         parent::__construct($registry, Series::class);
     }
 
-    public function add(Series $entity, bool $flush = false): void 
+    public function add(SeriesCreateFormInput $input): Series 
     {
 
-        $this->getEntityManager()->persist($entity);
+        // $this->getEntityManager()->persist($entity);
 
-        if($flush){
-            $this->getEntityManager()->flush();
+        // if($flush){
+        //     $this->getEntityManager()->flush();
+        // }
+
+        $entityManager = $this->getEntityManager();
+
+        $series = new Series($input->seriesName, $input->coverImage);
+        $entityManager->persist($series);
+        $entityManager->flush();
+
+        try {
+            $this->seasonRepository->addSeasonsQuantity($input->seasonsQuantity, $series->getId());
+            $seasons = $this->seasonRepository->findBy(['series' => $series]);
+            $this->episodeRepository->addEpisodesPerSeason($input->episodesPerSeason, $seasons);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+            $this->remove($series, true);
         }
+
+        return $series;
 
     }
 
