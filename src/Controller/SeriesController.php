@@ -100,7 +100,7 @@ class SeriesController extends AbstractController
                     //->priority(Email::PRIORITY_HIGH)
                     ->subject('Nova série criada')
                     ->text("Série {$series->getName()} foi criada")
-                    ->html('<h1>Série Criada!</h1><p>Série {$series->getName()} foi criada</p>');
+                    ->html("<h1>Série Criada!</h1><p>Série {$series->getName()} foi criada</p>");
 
         $this->mailer->send($email);
 
