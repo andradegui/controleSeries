@@ -43,28 +43,34 @@
 
                 {% if is_granted('ROLE_USER') %}
 
-                <a href="{{ path('app_season', {series: series.id}) }}" class="btn btn-light active" alt="Ver temporadas">                
-                    {{ series.name }}
-                </a>
+                    <a href="{{ path('app_season', {series: series.id}) }}" class="btn btn-light active" alt="Ver temporadas">                
+                        {{ series.name }}
+                    </a>
+
+                    {% if series.coverImagePath %}
+
+                        <img src="{{ asset('uploads/cover_image/') ~ series.coverImagePath }}" alt="Capa da série" class="img-fluid mb-3 rounded-2 border border-5" style="height: 120px; width: 120pxpx"/>
+
+                    {% endif %}
+
                 {% else %}
 
                  {{ series.name }}
 
                 {% endif %}
-
                   
                 {% if is_granted('ROLE_USER') %}
 
-                <div class="d-flex">
-                
-                    <a href="{{ path('app_edit_series_form', {series: series.id}) }}" class="btn btn-sm btn-warning me-2">Editar</a>
+                    <div class="d-flex">
+                    
+                        <a href="{{ path('app_edit_series_form', {series: series.id}) }}" class="btn btn-sm btn-warning me-2">Editar</a>
 
-                    <form method="post" action="{{ path('app_delete_series', {id: series.id}) }}">
-                        <input type="hidden" name="_method" value="DELETE"></input>                
-                        <button class="btn btn-sm btn-danger ">Deletar</button>
-                    </form>
-                
-                </div>
+                        <form method="post" action="{{ path('app_delete_series', {series: series.id}) }}">
+                            <input type="hidden" name="_method" value="DELETE"></input>                
+                            <button class="btn btn-sm btn-danger ">Deletar</button>
+                        </form>
+                    
+                    </div>
 
                 {% endif %}
 

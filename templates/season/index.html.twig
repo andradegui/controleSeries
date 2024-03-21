@@ -10,6 +10,11 @@
     </div> #}
     {% if is_granted('ROLE_USER') %}
 
+    <div class="text-center">
+        <img src="{{ asset('uploads/cover_image/') ~ series.coverImagePath }}" alt="Capa da série" class="img-fluid mb-3 rounded-4 border border-5" style="height: 230px; width: 160px"/>
+    <div>
+
+
     <ul class="list-group m-3">
 
     {% for season in seasons %}

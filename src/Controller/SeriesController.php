@@ -7,6 +7,7 @@ use App\Entity\Series;
 use App\Entity\Episode;
 use App\Form\SeriesType;
 use App\Form\SeriesEditType;
+use App\Message\SeriesWasDeleted;
 use Symfony\Component\Mime\Email;
 use App\DTO\SeriesCreateFormInput;
 use App\Repository\SeriesRepository;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,7 +30,8 @@ class SeriesController extends AbstractController
         private SeriesRepository $seriesRepository, 
         private EntityManagerInterface $entityManager,
         private MailerInterface $mailer,
-        private SluggerInterface $slugger
+        private SluggerInterface $slugger,
+        private MessageBusInterface $messenger,
     ){
 
     }
@@ -71,6 +74,12 @@ class SeriesController extends AbstractController
         $input = new SeriesCreateFormInput();
         $seriesForm = $this->createForm(SeriesType::class, $input)->handleRequest($request);
 
+        // Validação do Form
+        if( !$seriesForm->isValid() ){
+            return $this->renderForm('series/form.html.twig', compact('seriesForm'));
+        }
+
+        // Configuração upload de img 
         /**@var UploadedFile $uploadedCoverImage */
         $uploadedCoverImage = $seriesForm->get('coverImage')->getData();
 
@@ -88,10 +97,6 @@ class SeriesController extends AbstractController
 
             $input->coverImage = $newFilename;
 
-        }
-
-        if( !$seriesForm->isValid() ){
-            return $this->renderForm('series/form.html.twig', compact('seriesForm'));
         }
 
         // $series = new Series($input->seriesName);
@@ -135,11 +140,11 @@ class SeriesController extends AbstractController
 
     }
 
-    #[Route('/series/delete/{id}', name: 'app_delete_series', methods:['DELETE'], requirements:['id' => '[0-9]+'])]
-    public function deleteSeries(int $id, Request $request, Series $series): Response
+    #[Route('/series/delete/{series}', name: 'app_delete_series', methods:['DELETE'])]
+    public function deleteSeries(Series $series, Request $request): Response
     {       
-        $this->seriesRepository->removeById($id);
-
+        $this->seriesRepository->remove($series, true);
+        $this->messenger->dispatch(new SeriesWasDeleted($series));
         $this->addFlash('danger', "Série \"{$series->getName()}\" removida c/ sucesso");
         
         // Forma simples de trabalhar com Flash Message

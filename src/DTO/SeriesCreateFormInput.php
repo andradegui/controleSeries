@@ -18,7 +18,6 @@ class SeriesCreateFormInput{
         #[Assert\Positive]
         public int $episodesPerSeason = 0,
 
-        #[Assert\File]
         public ?string $coverImage = null,
 
     ){

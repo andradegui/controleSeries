@@ -6,6 +6,7 @@ use App\Entity\Series;
 use App\DTO\SeriesCreateFormInput;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -18,7 +19,18 @@ class SeriesType extends AbstractType
         $builder->add('seriesName', options: ['label' => 'Nome Série:'])
                 ->add('seasonsQuantity', NumberType::class, options: ['label' => 'Qtd. Temporadas:'])
                 ->add('episodesPerSeason', NumberType::class, options: ['label' => 'Ep. por Temporada:'])
-                ->add('coverImage', FileType::class, options: ['label' => 'Imagem da capa:', 'mapped' => 'false'])
+                ->add(
+                        'coverImage', 
+                        FileType::class, 
+                        options: [
+                            'label' => 'Imagem da capa:', 
+                            'mapped' => 'false',
+                            'required' => false,
+                            'constraints' => [
+                                new File(mimeTypes: 'image/*')
+                            ]
+                        ]
+                    )
                 ->add('save', SubmitType::class, ['label' => 'Adicionar'])
         ;
 
