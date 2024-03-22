@@ -3,7 +3,8 @@
 - PHP 8.2;
 - Symfony 6.3;
 - Boostrap 5.2;
-- SQLite.
+- Mysql;
+- SQLite p/ testes.
 
 ## Comandos Úteis
 
@@ -37,6 +38,9 @@
 ### Listar as rotas da aplicação
 `php bin/console debug:router`
 
+### Rodar SQL pelo terminal
+`php bin/console doctrine:query:sql`
+
 ### Criar arquivo de formulário
 `php bin/console make:form SeriesType`
 
@@ -48,3 +52,17 @@
 `php bin/console make:migration`
 `composer require symfonycasts/verify-email-bundle`
 `php bin/console make:registration-form`
+
+### Testes 
+
+`php bin/phpunit`
+`composer require --dev dama/doctrine-test-bundle`
+`composer require --dev orm-fixtures`
+
+> No .env.test deve ser criado um novo BD chamado test
+`DATABASE_URL="sqlite:///%kernel.project_dir%/var/test.db"`
+`MAILER_DSN=null://null`
+`MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0`
+`php bin/console --env=test doctrine:schema:create`
+
+`php bin/console --env=test doctrine:fixtures:load`
